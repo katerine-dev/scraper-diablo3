@@ -6,7 +6,8 @@ endpoint <- "barbarian-rend-build-with-wrath-of-the-wastes"
 
 url_completa <- paste0(URL_BASE, endpoint)
 
-response <- httr::GET(url_completa, httr::write_disk("output/diablo.html"))
+response <-
+  httr::GET(url_completa, httr::write_disk("output/diablo.html"))
 
 html_file <- readr::read_file("output/diablo.html")
 
@@ -14,15 +15,16 @@ html_file <- readr::read_file("output/diablo.html")
 
 # Parse -----------------------------------------------------------------------------------------------------------------------------------------
 
-  lista <- httr::content(response, encoding = "UTF-8") |>
-    #xml2::xml_find_all("ul") |>
-    rvest::html_nodes("ul")
+itens <- httr::content(response, encoding = "UTF-8") |>
+  rvest::html_nodes("ul") |>
+  rvest::html_text() |>
+  tibble::enframe() |>
+  dplyr::filter(name == c("5", "6", "7", "8"))
 
-  lista_2 <- lista[[5]] |>
-   ## tem que transformar em um DF
-  purrr::map(xml2::xml_attrs) |>
-  purrr::map_df(~as.list(.))
+personagem <- httr::content(response, encoding = "UTF-8") |>
+  rvest::html_nodes("h1") |>
+  rvest::html_text() |>
+  tibble::enframe()
 
-
-lista[[8]]
-
+#pronto <- lista |>
+#  dplyr::full_join(lista_2)
